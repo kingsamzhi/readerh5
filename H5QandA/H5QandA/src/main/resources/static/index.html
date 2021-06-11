@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>阅读之星</title>
+    <script type="text/javascript" src="./admin/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="./admin/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./admin/js/xadmin.js"></script>
+</head>
+<body>
+<script>
+    var token=getQueryVariable("token");
+    if (token != null && token.trim() != "") {
+        window.localStorage.setItem("token",token);
+        $("#info").html(token);
+        //这里跳转到你的首页：
+        window.location.href="http://jiankong.zooquan.top/yuedu/paihang.html?type=2";
+
+    }else{
+        $("#info").html("token is null ");
+
+    }
+</script>
+
+<div id="info">
+</div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body class="layui-anim layui-anim-up">
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">自动回复</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新" id="layui-laypage-btn">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <xblock>
+        <button class="layui-btn" onclick="x_admin_show('添加','./teacher-add.html',1200,800)"><i class="layui-icon"></i>添加</button>
+      </xblock>
+      <table id="demo" lay-filter="test"></table>
+ <script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit"  >编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" >删除</a>
+</script>
+ 
+<script>
+layui.use('table', function(){
+  var table = layui.table;
+  
+  //第一个实例
+  table.render({
+    elem: '#demo'
+    ,height: 0
+    ,url: '../teacher/getTeachers?flag=0' //数据接口
+    ,page: true //开启分页
+    ,cols: [[ //表头
+      {field: 'id', width:"10%",title: '编号', sort: true},
+      {field: 'area', width:"10%",title: '区', sort: true},
+      {field: 'town', width:"10%",title: '镇', sort: true},
+      {field: 'type', width:"10%",title: '学校类型', sort: true},
+      {field: 'schoolname', width:"10%",title: '学校', sort: true},
+      {field: 'name', width:"10%",title: '姓名', sort: true},
+      {field: 'code', width:"10%",title: '编码', sort: true},
+      {field: 'phone',width:"10%", title: '电话'},
+      {fixed: 'right', width:"20%", align:'center', toolbar: '#barDemo'}
+    ]]
+  });
+  
+  
+  //监听工具条
+	table.on('tool(test)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+  var data = obj.data; //获得当前行数据
+  var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+  var tr = obj.tr; //获得当前行 tr 的DOM对象
+ 
+  if(layEvent === 'del'){ //删除
+    layer.confirm('真的删除行数据吗?', function(index){
+                    
+               		$.post("../teacher/deleteTeacher", data, function (ret)
+                    {
+                        try {
+                          ret = JSON.parse(ret);
+                        }catch(e){}
+                        if (ret.code == "0") {
+                            layer.msg("删除成功！", { icon: 1, time: 1500 }, function () {
+                                obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                                $(".layui-laypage-btn").click();
+                            });
+                        } else
+                        {
+                            layer.msg("删除失败！", { icon: 2, time: 1500 });
+                        }
+                    });
+      layer.close(index);
+      //向服务端发送删除指令
+    });
+  } else if(layEvent === 'edit'){ //编辑
+    //do something
+    //do something
+    var url='./teacher-edit.html?id='+data["id"];
+    x_admin_show('编辑',url,1200,800);
+
+
+  }
+});
+  
+});
+</script>
+      
+    </div>
+    <script>
+    
+
+    </script>
+
+  </body>
+
+</html>

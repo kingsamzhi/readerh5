@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form">
+        <div class="layui-form-item">
+
+
+            <label for="city" class="layui-form-label">
+                <span class="x-red">*</span>所属地
+            </label>
+            <div class=" layui-col-md2">
+
+                <select id="city" name="city" >
+                    <option value="440600000000">佛山市</option>
+                </select>
+                <input type="hidden" name="id" id="id" value="">
+            </div>
+            <div class=" layui-col-md2">
+                <select id="areas" lay-filter="devisionarea">
+                    <option value="">请选择</option>
+                </select>
+                <input type="hidden" name="area" id="area" value="">
+            </div>
+            <div class=" layui-col-md2">
+                <select id="towns" lay-filter="devisiontown">
+                    <option value="">请选择</option>
+                </select>
+                <input type="hidden" name="town" id="town" value="">
+            </div>
+
+        </div>
+
+
+        <div class="layui-form-item">
+            <label for="name" class="layui-form-label">
+                <span class="x-red">*</span>学校名称
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="name" name="name" required="" lay-verify="name"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="type" class="layui-form-label">
+                <span class="x-red">*</span>类型
+            </label>
+            <div class="layui-input-inline">
+                <select name="type" id="type" >
+                    <option value="小学">小学</option>
+                    <option value="初中">初中</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+            </label>
+            <button  class="layui-btn" lay-filter="add" lay-submit="">修改</button>
+        </div>
+    </form>
+</div>
+<script>
+
+    var id=getQueryVariable("id");
+    $("#id").val(id);
+    var url1 = "../school/getSchoolById?id=" + id;
+    $.get(url1, function (result) {
+        try {
+            result = JSON.parse(result);
+        } catch (e) {}
+        var data = result.data;
+        // console.log(shows)
+        // $.each(shows, function (index, data) {
+        console.log(data)
+        $("#name").val(data.name);
+        $("#type").val(data.type);
+        getoraginDevision('440600000000', data.area, data.town);
+        var form = layui.form;
+        form.render();
+    });
+
+
+
+
+    function getDevision(pcode,div){
+
+
+        $('#'+div).html("");
+        $('#'+div).append("<option value=''>请选择</option>");
+
+        $.post('../division/getDivisionByPcode?pcode='+pcode,null,function(result){
+            try {
+                result = JSON.parse(result);
+            }catch(e){}
+            var divisions=result.data;
+            $.each(divisions, function (index, data) {
+                var deptOption = "<option value='" + data.code + "'>" + data.name + "</option>";
+                $("#"+div).append(deptOption);
+
+            });
+            var form = layui.form;
+            form.render();
+
+        });
+    }
+   // getDevision('440600000000','areas');
+
+
+    function getoraginDevision(pcode, area, town) {
+
+        //区
+        $('#areas').html("");
+        $('#areas').append("<option value=''>请选择</option>");
+
+        $.post('../division/getDivisionByPcode?pcode=' + pcode, null, function (result) {
+            try {
+                result = JSON.parse(result);
+            } catch (e) {}
+            var areas = result.data;
+            var areaid = ""
+            $.each(areas, function (index, dataarea) {
+
+                var deptOptiona = "<option value='" + dataarea.code + "'>" + dataarea.name + "</option>";
+                if (dataarea.name == area) {
+                    deptOptiona = "<option value='" + dataarea.code + "' selected>" + dataarea.name + "</option>";
+                    areaid = dataarea.code;
+                }
+                $("#areas").append(deptOptiona);
+
+            });
+            if (areaid) {
+                //镇
+                $('#towns').html("");
+                $('#towns').append("<option value=''>请选择</option>");
+
+                $.post('../division/getDivisionByPcode?pcode=' + areaid, null, function (result) {
+                    try {
+                        result = JSON.parse(result);
+                    } catch (e) {}
+                    var towns = result.data;
+                    var townid = "";
+                    $.each(towns, function (index, datatown) {
+
+                        var deptOptiont = "<option value='" + datatown.code + "'>" + datatown.name + "</option>";
+                        if (datatown.name == town) {
+                            deptOptiont = "<option value='" + datatown.code + "' selected>" + datatown.name + "</option>";
+                            townid = datatown.code;
+                        }
+                        $("#towns").append(deptOptiont);
+                    });
+
+                    var form = layui.form;
+                    form.render();
+
+                });
+            }
+            var form = layui.form;
+            form.render();
+
+        });
+    }
+
+
+
+    layui.use(['form','layer'], function(){
+        $ = layui.jquery;
+        var form = layui.form ,layer = layui.layer;
+
+        //自定义验证规则
+        form.verify({
+            name: function(value){
+                if(value.length < 2){
+                    return '学校名称至少得2个字符啊';
+                }
+            }
+        });
+
+        form.on('select(devisionarea)', function(data){
+            var val=data.value;
+            var text =data.elem[data.elem.selectedIndex].text;
+
+            $('#towns').html("");
+            $('#towns').append("<option value=''>请选择</option>");
+            $('#towns').val(""); //镇
+            getDevision(val,'towns');
+        });
+
+
+
+        //监听提交
+        form.on('submit(add)', function(data){
+            console.log(data);
+            var areaoptions=$("#areas option:selected"); //获取选中的项
+            var townoptions=$("#towns option:selected"); //获取选中的项
+
+            data.field.flag=0;
+            data.field.city="佛山市";
+            data.field.area=areaoptions.text();
+            data.field.town=townoptions.text();
+
+            $.post('../school/editSchool',data.field,function(result){
+                try {
+                    result = JSON.parse(result);
+                }catch(e){}
+
+                layer.msg(result.msg, {icon: 6,time:1500},function () {
+                    // 获得frame索引
+                    if(result.code=="0"){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+
+                    }
+                    parent.location.reload();
+                });
+            });
+
+            return false;
+        });
+
+
+    });
+</script>
+
+</body>
+
+</html>
